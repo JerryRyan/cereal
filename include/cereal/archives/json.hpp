@@ -250,6 +250,18 @@ namespace cereal
       void saveValue(int64_t i64)           { itsWriter.Int64(i64);                                                      }
       //! Saves a uint64 to the current node
       void saveValue(uint64_t u64)          { itsWriter.Uint64(u64);                                                     }
+      //! Saves an int128 as a string of two int64
+      void saveValue(__int128 i128) {
+    	  uint64_t m(~0);
+    	  std::string srep( std::to_string(((uint64_t)(i128>>64))&m) + ":" + std::to_string((uint64_t)(i128 & m)));
+    	  itsWriter.String( srep.c_str() );
+      }
+      //! Saves an unsigned int128 as a string of two int64
+      void saveValue(unsigned __int128 u128) {
+    	  uint64_t m(~0);
+    	  std::string srep( std::to_string(((uint64_t)(u128>>64))&m) + ":" + std::to_string((uint64_t)(u128&m)));
+    	  itsWriter.String( srep.c_str() );
+      }
       //! Saves a double to the current node
       void saveValue(double d)              { itsWriter.Double(d);                                                       }
       //! Saves a string to the current node
@@ -308,6 +320,8 @@ namespace cereal
                                           !std::is_same<T, unsigned long>::value,
                                           !std::is_same<T, std::int64_t>::value,
                                           !std::is_same<T, std::uint64_t>::value,
+                                          !std::is_same<T, __int128>::value,
+                                          !std::is_same<T, unsigned __int128>::value,
                                           (sizeof(T) >= sizeof(long double) || sizeof(T) >= sizeof(long long))> = traits::sfinae> inline
       void saveValue(T const & t)
       {
@@ -707,12 +721,29 @@ namespace cereal
                                           !std::is_same<T, unsigned long>::value,
                                           !std::is_same<T, std::int64_t>::value,
                                           !std::is_same<T, std::uint64_t>::value,
+                                          !std::is_same<T, __int128>::value,
+                                          !std::is_same<T, unsigned __int128>::value,
                                           (sizeof(T) >= sizeof(long double) || sizeof(T) >= sizeof(long long))> = traits::sfinae>
       inline void loadValue(T & val)
       {
         std::string encoded;
         loadValue( encoded );
         stringToNumber( encoded, val );
+      }
+
+      template<class T, traits::EnableIf<std::is_same<T,__int128>::value || std::is_same<T,unsigned __int128>::value> = traits::sfinae>
+      inline void loadValue(T & val) {
+    	std::string sval;
+    	loadValue( sval );
+    	std::stringstream ss( sval );
+  		uint64_t hi, lo;
+    	ss >> hi;
+    	ss.get();
+    	ss >> lo;
+    	if( ss.eof() )
+    		val = (__int128(hi)<<64) | lo;
+    	else
+    		val = 0;
       }
 
       //! Loads the size for a SizeTag
