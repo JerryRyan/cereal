@@ -253,13 +253,13 @@ namespace cereal
       //! Saves an int128 as a string of two int64
       void saveValue(__int128 i128) {
     	  uint64_t m(~0);
-    	  std::string srep( std::to_string(((uint64_t)(i128>>64))&m) + ":" + std::to_string((uint64_t)(i128 & m)));
+    	  std::string srep( std::to_string((uint64_t(i128>>64))&m) + ":" + std::to_string(uint64_t(i128 & m)));
     	  itsWriter.String( srep.c_str() );
       }
       //! Saves an unsigned int128 as a string of two int64
       void saveValue(unsigned __int128 u128) {
     	  uint64_t m(~0);
-    	  std::string srep( std::to_string(((uint64_t)(u128>>64))&m) + ":" + std::to_string((uint64_t)(u128&m)));
+    	  std::string srep( std::to_string((uint64_t(u128>>64))&m) + ":" + std::to_string(uint64_t(u128&m)));
     	  itsWriter.String( srep.c_str() );
       }
       //! Saves a double to the current node
