@@ -250,7 +250,8 @@ namespace cereal
       void saveValue(int64_t i64)           { itsWriter.Int64(i64);                                                      }
       //! Saves a uint64 to the current node
       void saveValue(uint64_t u64)          { itsWriter.Uint64(u64);                                                     }
-      //! Saves an int128 as a string of two int64
+#ifdef __SIZEOF_INT128__
+	  //! Saves an int128 as a string of two int64
       void saveValue(__int128 i128) {
     	  uint64_t m(~0);
     	  std::string srep( std::to_string((uint64_t(i128>>64))&m) + ":" + std::to_string(uint64_t(i128 & m)));
@@ -262,6 +263,7 @@ namespace cereal
     	  std::string srep( std::to_string((uint64_t(u128>>64))&m) + ":" + std::to_string(uint64_t(u128&m)));
     	  itsWriter.String( srep.c_str() );
       }
+#endif
       //! Saves a double to the current node
       void saveValue(double d)              { itsWriter.Double(d);                                                       }
       //! Saves a string to the current node
