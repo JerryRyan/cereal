@@ -322,8 +322,10 @@ namespace cereal
                                           !std::is_same<T, unsigned long>::value,
                                           !std::is_same<T, std::int64_t>::value,
                                           !std::is_same<T, std::uint64_t>::value,
+#ifdef __SIZEOF_INT128__
                                           !std::is_same<T, __int128>::value,
                                           !std::is_same<T, unsigned __int128>::value,
+#endif
                                           (sizeof(T) >= sizeof(long double) || sizeof(T) >= sizeof(long long))> = traits::sfinae> inline
       void saveValue(T const & t)
       {
@@ -723,8 +725,10 @@ namespace cereal
                                           !std::is_same<T, unsigned long>::value,
                                           !std::is_same<T, std::int64_t>::value,
                                           !std::is_same<T, std::uint64_t>::value,
+#ifdef __SIZEOF_INT128__
                                           !std::is_same<T, __int128>::value,
                                           !std::is_same<T, unsigned __int128>::value,
+#endif
                                           (sizeof(T) >= sizeof(long double) || sizeof(T) >= sizeof(long long))> = traits::sfinae>
       inline void loadValue(T & val)
       {
@@ -733,6 +737,7 @@ namespace cereal
         stringToNumber( encoded, val );
       }
 
+#ifdef __SIZEOF_INT128__
       template<class T, traits::EnableIf<std::is_same<T,__int128>::value || std::is_same<T,unsigned __int128>::value> = traits::sfinae>
       inline void loadValue(T & val) {
     	std::string sval;
@@ -747,6 +752,7 @@ namespace cereal
     	else
     		val = 0;
       }
+#endif
 
       //! Loads the size for a SizeTag
       void loadSize(size_type & size)
